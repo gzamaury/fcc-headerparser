@@ -24,6 +24,41 @@ app.get('/api/hello', function (req, res) {
   res.json({ greeting: 'hello API' });
 });
 
+// Header Parser Microservice
+const headerParserPath = '/api/whoami';
+const gettingIp = (req, res, next) => {
+  req.ipaddress = req.ip;
+  
+  next()
+}
+const gettingLanguage = (req, res, next) => {
+  req.language = req.headers['accept-language'];
+  
+  next();
+}
+const gettingBrowser = (req, res, next) => {
+  req.software = req.headers['user-agent'];
+  
+  next();
+}
+const headerParserHandler = (req, res) => {
+  let resObj = {
+    ipaddress: req.ipaddress,
+    language: req.language,
+    software: req.software
+  };
+
+  res.json(resObj);
+}
+
+app.get(
+  headerParserPath, 
+  gettingIp, 
+  gettingLanguage, 
+  gettingBrowser,
+  headerParserHandler
+);
+
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
