@@ -27,25 +27,37 @@ app.get('/api/hello', function (req, res) {
 // Header Parser Microservice
 const headerParserPath = '/api/whoami';
 const gettingIp = (req, res, next) => {
-  console.log(`ip: ${req.ip}`);
   req.ipaddress = req.ip;
   
   next()
 }
 const gettingLanguage = (req, res, next) => {
-  console.log(`language: ${req.headers['accept-language']}`);
   req.language = req.headers['accept-language'];
   
-  next()
+  next();
 }
 const gettingBrowser = (req, res, next) => {
-  console.log(`software: ${req.headers['user-agent']}`);
   req.software = req.headers['user-agent'];
   
-  next()
+  next();
+}
+const headerParserHandler = (req, res) => {
+  let resObj = {
+    ipaddress: req.ipaddress,
+    language: req.language,
+    software: req.software
+  };
+
+  res.json(resObj);
 }
 
-app.get(headerParserPath, gettingIp, gettingLanguage, gettingBrowser);
+app.get(
+  headerParserPath, 
+  gettingIp, 
+  gettingLanguage, 
+  gettingBrowser,
+  headerParserHandler
+);
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
