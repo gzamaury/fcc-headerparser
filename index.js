@@ -38,8 +38,14 @@ const gettingLanguage = (req, res, next) => {
   
   next()
 }
+const gettingBrowser = (req, res, next) => {
+  console.log(`software: ${req.headers['user-agent']}`);
+  req.software = req.headers['user-agent'];
+  
+  next()
+}
 
-app.get(headerParserPath, gettingIp, gettingLanguage);
+app.get(headerParserPath, gettingIp, gettingLanguage, gettingBrowser);
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
