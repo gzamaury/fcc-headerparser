@@ -32,8 +32,14 @@ const gettingIp = (req, res, next) => {
   
   next()
 }
+const gettingLanguage = (req, res, next) => {
+  console.log(`language: ${req.headers['accept-language']}`);
+  req.language = req.headers['accept-language'];
+  
+  next()
+}
 
-app.get(headerParserPath,gettingIp);
+app.get(headerParserPath, gettingIp, gettingLanguage);
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT || 3000, function () {
