@@ -1,65 +1,30 @@
-// index.js
-// where your node app starts
+require("dotenv").config();
+const express = require("express");
+const app = express();
+const cors = require("cors");
 
-// init project
-require('dotenv').config();
-var express = require('express');
-var app = express();
+const whoamiRouter = require("./routes/whoami");
 
-// enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-// so that your API is remotely testable by FCC
-var cors = require('cors');
-app.use(cors({ optionsSuccessStatus: 200 })); // some legacy browsers choke on 204
+app.use(cors({ optionsSuccessStatus: 200 }));
+app.use(express.static("public"));
 
-// http://expressjs.com/en/starter/static-files.html
-app.use(express.static('public'));
-
-// http://expressjs.com/en/starter/basic-routing.html
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/views/index.html');
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/views/index.html");
 });
 
-// your first API endpoint...
-app.get('/api/hello', function (req, res) {
-  res.json({ greeting: 'hello API' });
+app.get("/api/hello", function (req, res) {
+  res.json({ greeting: "hello API" });
 });
 
-// Header Parser Microservice
-const headerParserPath = '/api/whoami';
-const gettingIp = (req, res, next) => {
-  req.ipaddress = req.ip;
-  
-  next()
-}
-const gettingLanguage = (req, res, next) => {
-  req.language = req.headers['accept-language'];
-  
-  next();
-}
-const gettingBrowser = (req, res, next) => {
-  req.software = req.headers['user-agent'];
-  
-  next();
-}
-const headerParserHandler = (req, res) => {
-  let resObj = {
-    ipaddress: req.ipaddress,
-    language: req.language,
-    software: req.software
-  };
+app.use(whoamiRouter);
 
-  res.json(resObj);
+const port = process.env.PORT || 3000;
+let server = app;
+
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(port, function () {
+    console.log("Your app is listening on port " + server.address().port);
+  });
 }
 
-app.get(
-  headerParserPath, 
-  gettingIp, 
-  gettingLanguage, 
-  gettingBrowser,
-  headerParserHandler
-);
-
-// listen for requests :)
-var listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
-});
+module.exports = server;
