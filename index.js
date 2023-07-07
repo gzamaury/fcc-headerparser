@@ -1,53 +1,22 @@
-require('dotenv').config();
-var express = require('express');
-var app = express();
+require("dotenv").config();
+const express = require("express");
+const app = express();
+const cors = require("cors");
 
-var cors = require('cors');
+const whoamiRouter = require("./routes/whoami");
+
 app.use(cors({ optionsSuccessStatus: 200 }));
+app.use(express.static("public"));
 
-app.use(express.static('public'));
-
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/views/index.html');
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/views/index.html");
 });
 
-app.get('/api/hello', function (req, res) {
-  res.json({ greeting: 'hello API' });
+app.get("/api/hello", function (req, res) {
+  res.json({ greeting: "hello API" });
 });
 
-const headerParserPath = '/api/whoami';
-const gettingIp = (req, res, next) => {
-  req.ipaddress = req.ip;
-  
-  next()
-}
-const gettingLanguage = (req, res, next) => {
-  req.language = req.headers['accept-language'];
-  
-  next();
-}
-const gettingBrowser = (req, res, next) => {
-  req.software = req.headers['user-agent'];
-  
-  next();
-}
-const headerParserHandler = (req, res) => {
-  let resObj = {
-    ipaddress: req.ipaddress,
-    language: req.language,
-    software: req.software
-  };
-
-  res.json(resObj);
-}
-
-app.get(
-  headerParserPath, 
-  gettingIp, 
-  gettingLanguage, 
-  gettingBrowser,
-  headerParserHandler
-);
+app.use(whoamiRouter);
 
 const port = process.env.PORT || 3000;
 let server = app;
